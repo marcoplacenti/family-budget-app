@@ -1,0 +1,56 @@
+.transactions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .transactions h1 {
+    font-size: 24px;
+    color: #2c3e50;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  label {
+    font-size: 14px;
+    color: #2c3e50;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #ecf0f1;
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+    background-color: #1abc9c;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #16a085;
+  }
+
+  .transaction-cell {
+    color: black; /* Default color */
+  }
+  
+  .transaction-cell.negative {
+    color: red; /* Color for negative transactions */
+  }
+  
+  

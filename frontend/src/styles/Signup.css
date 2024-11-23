@@ -1,0 +1,75 @@
+/* Centering the form in the viewport */
+.signup-container {
+    display: flex;
+    flex-direction: column; /* Stack form and button vertically */
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height for vertical centering */
+    width: 100vw; /* Full viewport width for horizontal centering */
+    background-color: #f0f2f5; /* Light background for aesthetics */
+    margin: 0;
+}
+
+/* Form styling */
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: 300px;
+    gap: 15px;
+}
+
+/* Form title */
+.signup-form h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Input field styles */
+.signup-form input {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%; /* Ensures input takes the full width of the form */
+    box-sizing: border-box; /* Includes padding in the width calculation */
+}
+
+/* Submit button styles */
+.signup-form button {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #02d12b;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    width: 100%; /* Ensures button takes the full width of the form */
+    box-sizing: border-box; /* Includes padding in the width calculation */
+}
+
+/* Hover effect */
+.signup-form button:hover {
+    background-color: #01a020; /* Change to the desired color on hover */
+}
+
+/* Login-up button styling */
+.login-button {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: transparent; /* Make background transparent */
+    color: #01a020; /* Blue text color */
+    border: none;
+    cursor: pointer;
+    width: 300px; /* Same width as the form */
+    margin-top: 15px; /* Adds space between the form and the button */
+    box-sizing: border-box; /* Ensures button takes the full width */
+    font-size: 14px; /* Smaller font size */
+    text-decoration: underline; /* Underline the text */
+}
+
+.login-button:hover {
+    background-color: transparent; /* Blue background on hover */
+    color: #01a020; /* White text on hover */
+}

@@ -1,0 +1,184 @@
+/* Flexbox container for layout */
+.overview {
+  display: flex; /* Enables flexbox layout */
+  height: 100vh; /* Ensure the container takes the full height of the viewport */
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed; /* Fixes the sidebar to the left */
+  width: 250px; /* Fixed width for the sidebar */
+  height: 100vh; /* Full height of the viewport */
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  top: 0;
+  bottom: 0;
+  position: sticky; /* Sidebar will stay fixed as you scroll */
+}
+
+.sidebar .logout-button {
+  background-color: #ff6000;
+  color: white;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #34495e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar button:hover {
+  background-color: #1abc9c;
+}
+
+/* Main content styles */
+.main-content {
+  flex: 1; /* The main content will take up the remaining space */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+}
+
+/* Content styles */
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+h3 {
+  color: #333;
+  margin-top: 30px;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.table-title {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+table.financial-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table.financial-table th,
+table.financial-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+table.financial-table th {
+  background-color: #f2f2f2;
+}
+
+table.financial-table input {
+  width: 80%;
+  padding: 6px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+table.financial-table td input {
+  border: 1px solid #ddd;
+}
+
+table.financial-table .positive {
+  color: green;
+  font-weight: bold;
+}
+
+table.financial-table .negative {
+  color: red;
+  font-weight: bold;
+}
+
+/* Bank Overview */
+.bank-overview {
+  margin-left: 20px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bank-overview .bank-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.bank-overview .bank-details div {
+  margin: 0 20px;
+}
+
+/* Dropdown */
+.dropdown-container {
+  margin-left: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.edit-provisions-button {
+  margin-top: 10px; /* Add space below the dropdown */
+  position: relative; /* Absolute positioning to control placement */
+  align-self: flex-end; /* Aligns the button to the right */
+  padding: 5px 10px; /* Reduced padding for smaller size */
+  background-color: #007bff; /* Blue color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; /* Smaller font size */
+  font-weight: 500; /* Medium weight for a clean look */
+  transition: background-color 0.3s ease;
+  width: auto; /* Automatically adjust width based on content */
+  min-width: 80px; /* Ensure it's not too small */
+  text-align: center; /* Centers the text */
+}
+
+.edit-provisions-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.edit-provisions-button:active {
+  background-color: #003d80; /* Even darker blue when clicked */
+}
+
+
+#month-year-dropdown {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+table.financial-table .transaction-cell {
+  color: red;
+}
+
+table.financial-table .provision-cell {
+  color: blue;
+}
+
+table.financial-table .account-cell {
+  font-weight: bold
+}

@@ -1,0 +1,21 @@
+.dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .dropdown label {
+    font-size: 14px;
+    color: #34495e;
+  }
+  
+  .dropdown select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #ecf0f1;
+  }
+  
