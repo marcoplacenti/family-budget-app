@@ -145,31 +145,10 @@ function UserSetup() {
 
     const allBalances = Object.assign({}, basicNeeedsCategories, dailyNeedsCategories, entertainmentsCategories, savingsCategories);
 
-    // Authenticate
-    const initializeUserData = async () => {
-      try {
-          const functionName = "InitializeUserData";
-          const payload = { idToken, startMonth, currency, allBalances };
-          const result = await lambdaInvoker.invoke(functionName, payload)
-          //navigate("/home")
-          console.log(result)
-          const statusCode = result.statusCode;
-          const body = JSON.parse(result.body);
-          if (statusCode === 200){
-            navigate("/home")
-          } else {
-            console.error("Login failed:", result);
-            alert("You have provided invalid amounts! Please try again.");
-            //navigate("/overview")
-          return result
-          }
-  
-      } catch (error) {
-          console.error("Failed to authenticate:", error);
-      }
-    };
-
-    initializeUserData();
+    const functionName = "InitializeUserData";
+    const payload = { idToken, startMonth, currency, allBalances };
+    lambdaInvoker.invoke(functionName, payload)
+    navigate("/home")
   };
   
   return (

@@ -18,10 +18,16 @@ def lambda_handler(event, context):
     print(event)
     """
     {
-        'idToken': 'eyJraWQiOiI0WHd3QmFtSDlZVGlzV1JDaER3TWFQUFRRRStkenNWVllNcWJ4RFRmTEdjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0MzY0MzgyMi0zMDUxLTcwNDItYjAzYS05MWFkN2U4NGVmZDYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmV1LWNlbnRyYWwtMS5hbWF6b25hd3MuY29tXC9ldS1jZW50cmFsLTFfRlRYeEFPNGRVIiwiY29nbml0bzp1c2VybmFtZSI6IjQzNjQzODIyLTMwNTEtNzA0Mi1iMDNhLTkxYWQ3ZTg0ZWZkNiIsIm9yaWdpbl9qdGkiOiIxYjRlYTQ3NC05ODAyLTQ4ZWQtYjI3ZC03YWJjZGVmNWNlMmEiLCJhdWQiOiIybm5qMjNwcDh1Z29wcWtjcXQ3dWNvazFlYiIsImV2ZW50X2lkIjoiNDk5NWVkNGQtOTExMC00ZTk3LWE1NzUtNGMxNzAwOTU0MmE3IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3MzIxMjM4NjIsImV4cCI6MTczMjEyNzQ2MiwiaWF0IjoxNzMyMTIzODYyLCJqdGkiOiIwNDFhYzg0Yy0xYjYxLTQ1ODgtOGI4Ni1iMDAwY2EzOTlhNGQiLCJlbWFpbCI6InBsYWNlbnRpLm1hcmNvQGdtYWlsLmNvbSJ9.af_6845ZuEndcfH26DVhqXHobwfzcU12jb1mFlGSm2jhRrgAzcYYBqmwKwcWB2K3e2P-b3c6B99HWvPAKjeI0ZIyEI27voly8LM9DV3bQ-sOym0yItpesmCujN0VzrUcMqYgEOIKaZ8Jxy_sjWRzAOVbEXgVHJU78Y_etDSFrLEh6saCWKquHvL_rjkIKu0TP4PsXh3hUQQY6nwjA4t7LQ7T3QsNeqfNA7kB40nbN6RmlOSjo6iq_WdR7xfLHy8eDs961oRlzNHva5GhAQm2BSEg7GzLNOCE7XjEzWWp_ZUN4SsCqvfoBw850gqMX3tqwD2KGTdpfldA9FSkVEghGA',
-        'balances': {'Affitto': 'aa', 'Elettricità': 'bb', 'Assicurazione': 'hh', 'Alimentari': 'gg', 'Uscite': 'tt'}
+        'idToken': 'eyJraWQiOiJhSnkzaE5KM01mR3dkMVVnSkpCUFZ5UGJoVGRXMnQ3RTllTWFnNk5RYTQ0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMzY0MDhiMi0zMDQxLTcwZWMtMTA0MS0zZmZjNDY4Y2U3ZDIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX1ZjZ3RpNmlXOSIsImNvZ25pdG86dXNlcm5hbWUiOiJkMzY0MDhiMi0zMDQxLTcwZWMtMTA0MS0zZmZjNDY4Y2U3ZDIiLCJvcmlnaW5fanRpIjoiMjNhZTAxNTgtMGQyNi00NmY2LWE5NGUtM2EzOWIwOGU0ZmEwIiwiYXVkIjoiYjkxcXMybmJjZWxzcGFkMzRoYzJwNGtwaiIsImV2ZW50X2lkIjoiNTA3ZjM3NTQtMjExYy00OTM3LTg3YmItN2RlOWYyYmZkMWQzIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3MzIzNjE4MjEsImV4cCI6MTczMjM2NTQyMSwiaWF0IjoxNzMyMzYxODIxLCJqdGkiOiI2MmM1ZDZkMC1kODM3LTRjZGMtYTExZS05M2YwNWQ3ZjUwMTciLCJlbWFpbCI6InBsYWNlbnRpLm1hcmNvQGdtYWlsLmNvbSJ9.dSLUZHQryM097JyO8NUPWo3AkHpMa4rKNbLGn_0KrzANRddgkCGa2-VMd4rkNGvE2D1emdhjVx87lhyZnwUdCJTMfXbBuNLfEd-_19DoK7GUije9ruCsreuCdwMMB8HuKnBhDGn8aiP3lwIWdcSVE--vRCxwE7NxfwvtL34eGp4geSZOMORHgpPxXuzS9_xFQnG54nLlAMUZJTVs3Eaysi08-nx_989sacVnoe6qhcqD0WY_hmhqh3Xdq26hlnu-3b4WPsOlkGIc8ZcNRUwDZnlqvWhBwwDdMyX5rgZ7-bLb5RaQ9SqW5-0o67P6L189hbQlQL3C4qA2daEzFYCYPQ',
+        'startMonth': '2024-11',
+        'currency': 'DKK', 
+        'allBalances': {
+            'Affitto': '0,00', 'Assicurazione': '0,00', 'Elettricità': '0,00', 'Sindacato': '0,00', 'Telefonia': '0,00', 'TV': '0,00', 
+            'Alimentari': '0,00', 'Complementari': '0,00', 'Medicinali': '0,00', 'Mobilio': '0,00', 'Trasporto': '0,00', 'Visite Mediche': '0,00', 
+            'Personali Marco': '0,00', 'Personali Miriam': '0,00', 'Uscite': '0,00', 'Viaggi Palermo': '0,00', 'Viaggi Ricreativi': '0,00', 
+            'Automobile': '0,00', 'Casa Danimarca': '0,00', 'Casa Palermo': '0,00', 'Cassa': '0,00', 'Investimenti': '0,00', 'Safety Net': '0,00'
+        }
     }
-
     """
     id_token = event.get("idToken")
     decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
@@ -29,19 +35,20 @@ def lambda_handler(event, context):
 
     start_month = event.get("startMonth")
     currency = event.get("currency")
-    balances = event.get("balances")
+    balances = event.get("allBalances")
+
+    print(balances)
 
     currency_table = dynamodb_resource.Table('AccountsCurrency')
-    response = currency_table.put_item(
+    currency_table.put_item(
         Item={
             'User': user,
             'Currency': currency
         }
     )
 
-    print(user, start_month)
     periods_table = dynamodb_resource.Table('AccountsAvailablePeriods')
-    response = periods_table.put_item(
+    periods_table.put_item(
         Item={
             'User': user,
             'Periods': [start_month]
@@ -51,26 +58,27 @@ def lambda_handler(event, context):
     balances_table = dynamodb_resource.Table('AccountsBalances')
     provisions_table = dynamodb_resource.Table('AccountsProvisions')
     for account, amount in balances.items():
-        response = balances_table.put_item(
+        print(account, amount)
+        balances_table.put_item(
             Item={
                 'User': user,
                 'PeriodAccount': f"{start_month}_{account}",
-                'Amount': Decimal(amount)
+                'Amount': Decimal(amount.replace(',', '.'))
             }
         )
 
         date_obj = datetime.strptime(start_month, '%Y-%m')
         previous_month = date_obj - relativedelta(months=1)
         previous_month_str = previous_month.strftime('%Y-%m')
-        response = balances_table.put_item(
+        balances_table.put_item(
             Item={
                 'User': user,
                 'PeriodAccount': f"{previous_month_str}_{account}",
-                'Amount': Decimal(amount)
+                'Amount': Decimal(amount.replace(',', '.'))
             }
         )
 
-        response = provisions_table.put_item(
+        provisions_table.put_item(
             Item={
                 'User': user,
                 'PeriodAccount': f"{start_month}_{account}",
@@ -78,47 +86,10 @@ def lambda_handler(event, context):
             }
         )
 
-
-    print(response)
-
     return {
             "statusCode": 200,
             "body": json.dumps({
                 "message": "Data Inserted",
                 "userSub": "nvcidvcn"
-            })
-        }
-    
-    if not email or not password:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"message": "Email and password are required."})
-        }
-
-    try:
-        response = client.sign_up(
-            ClientId=APP_CLIENT_ID,
-            Username=email,
-            Password=password,
-            UserAttributes=[
-                {
-                    'Name': 'email',
-                    'Value': email
-                }
-            ]
-        )
-        return {
-            "statusCode": 200,
-            "body": json.dumps({
-                "message": "User successfully registered",
-                "userSub": response['UserSub']
-            })
-        }
-    except ClientError as e:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({
-                "message": "Registration failed",
-                "error": str(e)
             })
         }

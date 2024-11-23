@@ -51,18 +51,7 @@ function Home() {
         const result = await lambdaInvoker.invoke(functionName, payload)
         console.log(result)
         const statusCode = result.statusCode;
-        if (statusCode === 200){
-          setIsInitDataSubmitted(true);
-          fetchData(JSON.parse(result.body));
-          //fetchBankOverview(result.body);
-          //navigate("/overview")
-        } else {
-          setIsInitDataSubmitted(false);
-          setIsOverlayVisible(true)
-          //alert("You have provided invalid amounts! Please try again.");
-          //navigate("/overview")
-        }
-
+        fetchData(JSON.parse(result.body));
       } catch (error) {
         console.error("Something went wrong:", error);
       }
@@ -197,77 +186,6 @@ function Home() {
 
     initializeUserData();
   };
-  
-  if (!isInitDataSubmitted){
-    return (
-      <div className="app-container">
-        {/* Overlay Form */}
-        {isOverlayVisible && (
-          <div className="overlay">
-            <div className="form-container">
-              <h2>Initialize your accounts!</h2>
-              <h5>Looks like we have no data registered on your account. Please tell us how much money you currently have in these accounts.</h5>
-              <form onSubmit={onSubmitInitData}>
-                <div>
-                  <label htmlFor="startMonth">Select Month and Year</label>
-                  <input id="startmonth" type="month" required placeholder="Select Month and Year" />
-                </div>
-                <div>
-                  <label htmlFor="currency">Select Currency</label>
-                  <select id="currency" required>
-                    <option value="DKK">DKK</option>
-                    <option value="EUR">EUR</option>
-                    <option value="USD">USD</option>
-                  </select>
-                </div>
-                {defaultCategories.map((category, index) => (
-                  <div className="form-row" key={index}>
-                    <label htmlFor={`field-${index + 1}`}>{category}</label>
-                    <input 
-                      id={`field-${index + 1}`} 
-                      type="number" 
-                      step="0.01"
-                      defaultValue="0.00"
-                      onBlur={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value)) {
-                          e.target.value = value.toFixed(2); // Format to two decimals
-                        } else {
-                          const defaultonError = 0
-                          e.target.value = defaultonError.toFixed(2);
-                        }
-                      }}
-                    />
-                    </div>
-                ))}
-                {defaultCategories.map((category, index) => (
-                  <div className="form-row" key={index}>
-                    <label htmlFor={`field-${index + 1}`}>{category}</label>
-                    <input 
-                      id={`field-${index + 1}`} 
-                      type="number" 
-                      step="0.01"
-                      defaultValue="0.00"
-                      onBlur={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value)) {
-                          e.target.value = value.toFixed(2); // Format to two decimals
-                        } else {
-                          const defaultonError = 0
-                          e.target.value = defaultonError.toFixed(2);
-                        }
-                      }}
-                    />
-                    </div>
-                ))}
-                <button type="submit">Save</button>
-              </form>
-              <button className="logout-button" onClick={handleLogout}>Discard & Logout</button>
-            </div>
-          </div>
-        )}
-      </div>)
-  }
 
   return (
     

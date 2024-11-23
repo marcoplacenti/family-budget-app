@@ -2,6 +2,7 @@ import { Construct } from 'constructs';
 
 
 import {
+  Duration,
   Stack,
   StackProps,
   aws_cognito as cognito,
@@ -67,6 +68,9 @@ export class BackendStack extends Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonESCognitoAccess')
     );
 
+    authRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess')
+    );
 
     const signinLambda = new lambda.Function(this, 'signinLambda',
       {
@@ -82,17 +86,18 @@ export class BackendStack extends Stack {
       }
     )
 
-    const loginLambda = new lambda.Function(this, 'logininLambda',
+    const loginLambda = new PythonFunction(this, 'logininLambda',
       {
         functionName: 'AuthenticateLogin',
-        code: lambda.Code.fromAsset(path.join(__dirname, '../app/authenticateLogin')),
-        handler: "authenticateLogin.lambda_handler",
+        entry: './app/authenticateLogin',
         runtime: lambda.Runtime.PYTHON_3_12,
+        index: 'authenticateLogin.py',
+        handler: 'lambda_handler',
         role: authRole,
-        environment: {
-          "USER_POOL_ID": userPool.userPoolId,
-          "APP_CLIENT_ID": userPoolClient.userPoolClientId
-        }
+          environment: {
+            "USER_POOL_ID": userPool.userPoolId,
+            "APP_CLIENT_ID": userPoolClient.userPoolClientId
+          }
       }
     )
 
@@ -118,7 +123,8 @@ export class BackendStack extends Stack {
         environment: {
           "USER_POOL_ID": userPool.userPoolId,
           "APP_CLIENT_ID": userPoolClient.userPoolClientId
-        }
+        },
+      timeout: Duration.seconds(15)
     });
 
     const userDataFetcherLambda = new PythonFunction(this, 'userDataFetcherLambda', {

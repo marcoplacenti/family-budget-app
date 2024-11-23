@@ -1,9 +1,11 @@
 import json
+import jwt
 import boto3
 import os
 from botocore.exceptions import ClientError
 
 client = boto3.client('cognito-idp')
+dynamodb_resource = boto3.resource('dynamodb')
 
 USER_POOL_ID = os.environ['USER_POOL_ID']
 APP_CLIENT_ID = os.environ['APP_CLIENT_ID']
@@ -28,6 +30,25 @@ def lambda_handler(event, context):
                 "PASSWORD": password,
             }
         )
+
+        print(response)
+
+        id_token = response["AuthenticationResult"]["IdToken"]
+        decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
+        user = decoded_payload.get('sub')
+
+        currency_table = dynamodb_resource.Table('AccountsCurrency')
+        dynamodb_response = currency_table.get_item(
+            Key={
+                'User': user
+            }
+        )
+        if 'Item' not in dynamodb_response:
+            isInitialized = False
+        else:
+            isInitialized = True
+
+
         # Return tokens on success
         return {
             "statusCode": 200,
@@ -36,6 +57,7 @@ def lambda_handler(event, context):
                 "idToken": response["AuthenticationResult"]["IdToken"],
                 "accessToken": response["AuthenticationResult"]["AccessToken"],
                 "refreshToken": response["AuthenticationResult"]["RefreshToken"],
+                "isInitialized": isInitialized,
             })
         }
     except ClientError as e:
