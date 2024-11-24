@@ -6,8 +6,11 @@ import '../styles/InitUserData.css';
 import CustomLambdaInvocation from '../utils/CustomLambdaInvocation';
 
 function Home() {
-  const [basicCategories, setBasicCategories] = useState([]);
-  const [entertainmentCategories, setEntertainmentCategories] = useState([]);
+  const [basicNeedsAccounts, setBasicNeeds] = useState([]);
+  const [entertainmentsAccounts, setEntertainments] = useState([]);
+  const [dailyNeedsAccounts, setDailyNeeds] = useState([]);
+  const [savingsAccounts, setSavings] = useState([]);
+  const [availablePeriods, setAvailablePeriods] = useState([]);
   const [bankOverview, setBankOverview] = useState({});
   const [monthYear, setMonthYear] = useState(null);
 
@@ -15,19 +18,11 @@ function Home() {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
 
-  const [isInitDataSubmitted, setIsInitDataSubmitted] = useState(null);
-  const [initialBalances, setInitialBalances] = useState({});
-
   const navigate = useNavigate();
 
-  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [isEditOverlayVisible, setIsEditOverlayVisible] = useState(false);
 
   const lambdaInvoker = new CustomLambdaInvocation();
-
-  const defaultCategories = [
-    'Affitto', 'Elettricità', 'Assicurazione', 'Alimentari', 'Uscite'
-  ]
 
   useEffect(() => {
 
@@ -51,7 +46,8 @@ function Home() {
         const result = await lambdaInvoker.invoke(functionName, payload)
         console.log(result)
         const statusCode = result.statusCode;
-        fetchData(JSON.parse(result.body));
+        fetchData(JSON.parse(result.accountsData));
+        fetchPeriods(JSON.parse(result.availablePeriods));
       } catch (error) {
         console.error("Something went wrong:", error);
       }
@@ -63,7 +59,21 @@ function Home() {
     // Fetch financial data
     const fetchData = async (data) => {
       try {
-        setBasicCategories(data);
+        setBasicNeeds(data.filter(item => item.category === "basic"));
+        setDailyNeeds(data.filter(item => item.category === "daily"));
+        setEntertainments(data.filter(item => item.category === "entertainment"));
+        setSavings(data.filter(item => item.category === "saving"));
+        // setEntertainmentCategories(entertainment);
+      } catch (error) {
+        console.error("Failed to fetch financial data:", error);
+      }
+    };
+
+    const fetchPeriods = async (data) => {
+      try {
+        console.log(data)
+        setAvailablePeriods(data)
+        console.log(availablePeriods)
         // setEntertainmentCategories(entertainment);
       } catch (error) {
         console.error("Failed to fetch financial data:", error);
@@ -83,39 +93,48 @@ function Home() {
 
   }, []);
 
-  const handleProvisionChange = (index, category, event) => {
-    let value = event.target.value.toString(); // Take the input as-is
-    // value = value.replace(",", ".")
-    
-    const newData = [...category];
-    newData[index].provision = value;
+  const updateCategory = (category, newData) => {
+    const categoryKeys = JSON.stringify(Object.keys(category))
+    if (categoryKeys === JSON.stringify(Object.keys(basicNeedsAccounts))) {
+      setBasicNeeds(newData)
+    }
 
-    category === basicCategories ? setBasicCategories(newData) : setEntertainmentCategories(newData);
+    if (categoryKeys === JSON.stringify(Object.keys(dailyNeedsAccounts))) {
+      setDailyNeeds(newData)
+    }
+
+    if (categoryKeys === JSON.stringify(Object.keys(entertainmentsAccounts))) {
+      setEntertainments(newData)
+    }
+
+    if (categoryKeys === JSON.stringify(Object.keys(savingsAccounts))) {
+      setSavings(newData)
+    }
+  }
+
+  const handleProvisionChange = (index, category, event) => {
+    const newData = { ...category }; // Create a shallow copy of the category
+    newData[index] = event.target.value; // Update the specific field with the raw input
+    updateCategory(category, newData); // Update the state dynamically
   };
   
   const handleProvisionBlur = (index, category) => {
-    const newData = [...category];
-    let provisions = newData[index].provision.replace(',', '.');
-    let initial_balance = parseFloat(newData[index].initial_balance.replace(',', '.'))
-    let transactions = parseFloat(newData[index].transactions.replace(',', '.'))
-
-    if (!isNaN(parseFloat(provisions))) {
-      provisions = parseFloat(parseFloat(provisions).toFixed(2));
-      let current_balance = initial_balance + provisions - transactions
-      newData[index].current_balance = formatCurrency(current_balance)
-      newData[index].provision = formatCurrency(provisions)
+    const newData = { ...category }; // Create a shallow copy of the category
+    let value = category[index]; // Get the current value
+    value = value.replace('.', '').replace(',', '.'); // Normalize for parsing
+    
+    // Check if it's a valid number
+    if (!isNaN(parseFloat(value)) && isFinite(value)) {
+      // Format it as currency
+      value = formatCurrency(parseFloat(value));
     } else {
-      let current_balance = initial_balance - transactions
-      newData[index].current_balance = formatCurrency(current_balance)
-      newData[index].provision = formatCurrency(0);
+      alert("Invalid value. Will be reset to 0.")
+      // Set to "0,00" if invalid
+      value = "0,00";
     }
-
-    const functionName = "UserDataUpdater";
-    const payload = { idToken, newData };
-    lambdaInvoker.invoke(functionName, payload)
-
-    // Update state for the correct category
-    category === basicCategories ? setBasicCategories(newData) : setEntertainmentCategories(newData);
+  
+    newData[index] = value; // Update the value in the copied category
+    updateCategory(category, newData); // Update the state
   };
 
   const isNegative = (amount) => {
@@ -140,51 +159,8 @@ function Home() {
     setIsEditOverlayVisible(!isEditOverlayVisible);
   };
 
-  const onSubmitInitData = (event) => {
-    event.preventDefault();
-
-    setIsOverlayVisible(false);
-
-    const formInputs = event.target.elements;
-    const startMonth = formInputs['startmonth'].value
-    const currency = formInputs['currency'].value
-    const balances = defaultCategories.reduce((acc, category, index) => {
-      acc[category] = formInputs[`field-${index + 1}`].value;
-      return acc;
-    }, {});
-
-    // setInitialBalances(balances);
-    
-
-    // Now you can process or save initialBalances
-    //console.log(balances);
-
-    // Authenticate
-    const initializeUserData = async () => {
-      try {
-          const functionName = "InitializeUserData";
-          const payload = { idToken, startMonth, currency, balances };
-          const result = await lambdaInvoker.invoke(functionName, payload)
-          //console.log(result)
-          const statusCode = result.statusCode;
-          const body = JSON.parse(result.body);
-          if (statusCode === 200){
-            setIsInitDataSubmitted(true);
-            //navigate("/overview")
-          } else {
-            setIsInitDataSubmitted(false);
-            console.error("Login failed:", result);
-            alert("You have provided invalid amounts! Please try again.");
-            //navigate("/overview")
-          return result
-          }
-  
-      } catch (error) {
-          console.error("Failed to authenticate:", error);
-      }
-    };
-
-    initializeUserData();
+  const updateData = () => {
+    console.log(basicNeedsAccounts)
   };
 
   return (
@@ -233,67 +209,142 @@ function Home() {
           </button>
         </div>
 
-        {/* Basic Categories Table */}
-        <h3 className="table-title">Basic Needs Accounts</h3>
-        <div className="table-container">
-          <table className="financial-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Initial Budget</th>
-                <th>Provisions</th>
-                <th>Transactions</th>
-                <th>Current Budget</th>
-              </tr>
-            </thead>
-            <tbody>
-              {basicCategories.map((category, index) => (
-                <tr key={index}>
-                  <td classname='account-cell'>{category.name}</td>
-                  <td>{category.initial_balance} €</td>
-                  <td className='provision-cell'>{category.provision} €</td>
-                  <td className="transaction-cell">
-                    {category.transactions} €
-                  </td>
+        <div className="category-group-wrapper">
+          {/* Basic Categories Table */}
+          <div className="category-group basic-needs-group">
+            <h3 className="table-title">Basic Needs Accounts</h3>
+            <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Initial Budget</th>
+                    <th>Provisions</th>
+                    <th>Transactions</th>
+                    <th>Current Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {basicNeedsAccounts.map((category, index) => (
+                    <tr key={index}>
+                      <td classname='account-cell'>{category.name}</td>
+                      <td>{category.initial_balance} €</td>
+                      <td className='provision-cell'>{category.provision} €</td>
+                      <td className="transaction-cell">
+                        {category.transactions} €
+                      </td>
 
-                  <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
-                  {category.current_balance} €
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
+                      {category.current_balance} €
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Basic Categories Table */}
+          <div className="category-group entertainment-group">
+            <h3 className="table-title">Daily Needs Accounts</h3>
+            <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Initial Budget</th>
+                    <th>Provisions</th>
+                    <th>Transactions</th>
+                    <th>Current Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailyNeedsAccounts.map((category, index) => (
+                    <tr key={index}>
+                      <td>{category.name}</td>
+                      <td>{category.initial_balance} €</td>
+                      <td className='provision-cell'>{category.provision} €</td>
+                      <td className="transaction-cell">
+                        {category.transactions} €
+                      </td>
+                      <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
+                      {category.current_balance} €
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        {/* Basic Categories Table */}
-        <h3 className="table-title">Entertainment Accounts</h3>
-        <div className="table-container">
-          <table className="financial-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Initial Budget</th>
-                <th>Provisions</th>
-                <th>Transactions</th>
-                <th>Current Budget</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entertainmentCategories.map((category, index) => (
-                <tr key={index}>
-                  <td>{category.name}</td>
-                  <td>{category.initial_balance} €</td>
-                  <td className='provisions-cell'>{category.provision} €</td>
-                  <td className="transaction-cell">
-                    {category.transactions} €
-                  </td>
-                  <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
-                  {category.current_balance} €
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="category-group-wrapper">
+          {/* Basic Categories Table */}
+          <div className="category-group basic-needs-group">
+            <h3 className="table-title">Entertainments Accounts</h3>
+            <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Initial Budget</th>
+                    <th>Provisions</th>
+                    <th>Transactions</th>
+                    <th>Current Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entertainmentsAccounts.map((category, index) => (
+                    <tr key={index}>
+                      <td classname='account-cell'>{category.name}</td>
+                      <td>{category.initial_balance} €</td>
+                      <td className='provision-cell'>{category.provision} €</td>
+                      <td className="transaction-cell">
+                        {category.transactions} €
+                      </td>
+                      <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
+                      {category.current_balance} €
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Basic Categories Table */}
+          <div className="category-group entertainment-group">
+            <h3 className="table-title">Savings Accounts</h3>
+            <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Initial Budget</th>
+                    <th>Provisions</th>
+                    <th>Transactions</th>
+                    <th>Current Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {savingsAccounts.map((category, index) => (
+                    <tr key={index}>
+                      <td>{category.name}</td>
+                      <td>{category.initial_balance} €</td>
+                      <td className='provision-cell'>{category.provision} €</td>
+                      <td className="transaction-cell">
+                        {category.transactions} €
+                      </td>
+                      <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
+                      {category.current_balance} €
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
         {/* Overlay for Edit Provisions */}
         {isEditOverlayVisible && (
@@ -311,7 +362,7 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {basicCategories.map((category, index) => (
+                    {basicNeedsAccounts.map((category, index) => (
                       <tr key={index}>
                         <td>{category.name}</td>
                         <td>{category.initial_balance} €</td>
@@ -319,8 +370,8 @@ function Home() {
                           <input
                             type="text"
                             value={category.provision} 
-                            onChange={(e) => handleProvisionChange(index, basicCategories, e)} 
-                            onBlur={() => handleProvisionBlur(index, basicCategories)} 
+                            onChange={(e) => handleProvisionChange(index, basicNeedsAccounts, e)} 
+                            onBlur={() => handleProvisionBlur(index, basicNeedsAccounts)} 
                             placeholder="Enter provision"
                           />
                         </td>
@@ -335,7 +386,7 @@ function Home() {
                     ))}
                   </tbody>
                 </table>
-                <button onClick={toggleEditOverlay}>Save</button>
+                <button onClick={updateData}>Save</button>
                 <button onClick={toggleEditOverlay}>Close</button>
               </div>
             </div>

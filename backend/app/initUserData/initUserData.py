@@ -14,6 +14,32 @@ dynamodb_resource = boto3.resource('dynamodb')
 USER_POOL_ID = os.environ['USER_POOL_ID']
 APP_CLIENT_ID = os.environ['APP_CLIENT_ID']
 
+account_category = {
+    'Affitto': 'basic',
+    'Assicurazione': 'basic',
+    'Elettricità': 'basic',
+    'Sindacato': 'basic',
+    'Telefonia': 'basic',
+    'TV': 'basic',
+    'Alimentari': 'daily',
+    'Complementari': 'daily',
+    'Medicinali': 'daily',
+    'Mobilio': 'daily',
+    'Trasporto': 'daily',
+    'Visite Mediche': 'daily',
+    'Personali Marco': 'entertainment',
+    'Personali Miriam': 'entertainment',
+    'Uscite': 'entertainment',
+    'Viaggi Palermo': 'entertainment',
+    'Viaggi Ricreativi': 'entertainment',
+    'Automobile': 'saving',
+    'Casa Danimarca': 'saving',
+    'Casa Palermo': 'saving',
+    'Cassa': 'saving',
+    'Investimenti': 'saving',
+    'Safety Net': 'saving'
+}
+
 def lambda_handler(event, context):
     print(event)
     """

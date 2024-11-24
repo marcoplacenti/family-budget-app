@@ -98,7 +98,6 @@ function UserSetup() {
     if (categoryKeys === JSON.stringify(Object.keys(savingsCategories))) {
       setSavings(newData)
     }
-    
   }
   
   const handleProvisionBlur = (index, category) => {

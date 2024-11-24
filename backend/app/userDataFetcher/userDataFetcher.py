@@ -13,6 +13,32 @@ from dateutil.relativedelta import relativedelta
 dynamodb_resource = boto3.resource('dynamodb')
 dynamodb_client = boto3.client('dynamodb')
 
+account_category = {
+    'Affitto': 'basic',
+    'Assicurazione': 'basic',
+    'Elettricità': 'basic',
+    'Sindacato': 'basic',
+    'Telefonia': 'basic',
+    'TV': 'basic',
+    'Alimentari': 'daily',
+    'Complementari': 'daily',
+    'Medicinali': 'daily',
+    'Mobilio': 'daily',
+    'Trasporto': 'daily',
+    'Visite Mediche': 'daily',
+    'Personali Marco': 'entertainment',
+    'Personali Miriam': 'entertainment',
+    'Uscite': 'entertainment',
+    'Viaggi Palermo': 'entertainment',
+    'Viaggi Ricreativi': 'entertainment',
+    'Automobile': 'saving',
+    'Casa Danimarca': 'saving',
+    'Casa Palermo': 'saving',
+    'Cassa': 'saving',
+    'Investimenti': 'saving',
+    'Safety Net': 'saving'
+}
+
 def get_balance_or_provisions(user, period, table_name):
     response = dynamodb_client.query(
         TableName=table_name,
@@ -42,12 +68,14 @@ def lambda_handler(event, context):
     decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
     user = decoded_payload.get('sub')
 
+    available_periods_table = dynamodb_resource.Table('AccountsAvailablePeriods')
+    available_periods_response = available_periods_table.get_item(Key={'User': user})
+    available_periods = available_periods_response.get('Item')['Periods']
+
     if event.get("period") is not None:
         period = event.get("period")
     else:
-        available_periods_table = dynamodb_resource.Table('AccountsAvailablePeriods')
-        response = available_periods_table.get_item(Key={'User': user})
-        period = response.get('Item')['Periods'][-1]
+        period = available_periods[-1]
 
     date_obj = datetime.strptime(period, '%Y-%m')
     previous_period = date_obj - relativedelta(months=1)
@@ -78,14 +106,17 @@ def lambda_handler(event, context):
     for account in init_balance.keys():
         response.append({
             "name": account,
+            "category": account_category[account],
             "initial_balance": str(init_balance[account]),
             "provision": str(provisions[account]),
             "transactions": str(Decimal('0').quantize(Decimal('0.00'))).replace('.', ','),
-            "current_balance": str(current_balance[account])
+            "current_balance": str(current_balance[account]),
+            "available_periods": available_periods
         })
      
     print(json.dumps(response))
     return {
         "statusCode": 200,
-        "body": json.dumps(response)
+        "accountsData": json.dumps(response),
+        "availablePeriods": json.dumps({"available_periods": available_periods})
     }
