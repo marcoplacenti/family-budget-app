@@ -153,6 +153,19 @@ export class BackendStack extends Stack {
         }
     });
 
+    const openNewPeriodLambda = new PythonFunction(this, 'openNewPeriodLambda', {
+      functionName: 'OpenNewPeriod',
+      entry: './app/openNewPeriod',
+      runtime: lambda.Runtime.PYTHON_3_12,
+      index: 'openNewPeriod.py',
+      handler: 'lambda_handler',
+      role: userDataLambdaRole,
+        environment: {
+          "USER_POOL_ID": userPool.userPoolId,
+          "APP_CLIENT_ID": userPoolClient.userPoolClientId
+        }
+    });
+
     const accountBalanceTable = new dynamodb.Table(this, 'accountBalanceTable', {
       tableName: 'AccountsBalances',
       partitionKey: { name: 'User', type: dynamodb.AttributeType.STRING },

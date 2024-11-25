@@ -10,9 +10,9 @@ function Home() {
   const [entertainmentsAccounts, setEntertainments] = useState([]);
   const [dailyNeedsAccounts, setDailyNeeds] = useState([]);
   const [savingsAccounts, setSavings] = useState([]);
-  const [availablePeriods, setAvailablePeriods] = useState([]);
   const [bankOverview, setBankOverview] = useState({});
-  const [monthYear, setMonthYear] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(null); 
+  const [availableMonths, setAvailableMonths] = useState([]); 
 
   const [idToken, setIdToken] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
@@ -71,9 +71,12 @@ function Home() {
 
     const fetchPeriods = async (data) => {
       try {
-        console.log(data)
-        setAvailablePeriods(data)
-        console.log(availablePeriods)
+        // console.log(data)
+        // console.log(Array.isArray(data.available_periods))
+        // setAvailablePeriods([data.available_periods])
+        // console.log(availablePeriods)
+        // const months = ["2024-11", "2024-12", "2025-01"].reverse();
+        setAvailableMonths(data.available_periods.reverse())
         // setEntertainmentCategories(entertainment);
       } catch (error) {
         console.error("Failed to fetch financial data:", error);
@@ -159,7 +162,17 @@ function Home() {
     setIsEditOverlayVisible(!isEditOverlayVisible);
   };
 
-  const updateData = () => {
+  const openNextMonth = async () => {
+    const functionName = "OpenNewPeriod";
+    const payload = { idToken };
+    const result = await lambdaInvoker.invoke(functionName, payload)
+    console.log(result)
+    const newPeriod = result.new_period
+    updateData(newPeriod)
+  }
+
+  const updateData = (value) => {
+    console.log(value)
     console.log(basicNeedsAccounts)
   };
 
@@ -179,7 +192,7 @@ function Home() {
 
         {/* Bank Overview Section */}
         <div className="bank-overview">
-          <h3>Bank Overview for {monthYear}</h3>
+          <h3>Bank Overview for {selectedPeriod}</h3>
           <div className="bank-details">
             <div>
               <strong>Main Account:</strong> {bankOverview.mainAccount ? formatCurrency(bankOverview.mainAccount) : 'Loading...'} €
@@ -195,17 +208,20 @@ function Home() {
           <label htmlFor="month-year-dropdown">Select Month/Year: </label>
           <select
             id="month-year-dropdown"
-            value={monthYear}
-            onChange={(e) => setMonthYear(e.target.value)}
+            value={selectedPeriod}
+            onChange={(e) => updateData(e.target.value)}
           >
-            <option value="2024-01">January 2024</option>
-            <option value="2024-02">February 2024</option>
-            <option value="2024-11">November 2024</option>
+            {availableMonths.map((month) => (
+              <option key={month} value={month}>{new Date(month + "-01").toLocaleString('default', { month: 'long', year: 'numeric' })}</option>
+            ))}
           </select>
 
           {/* Edit Provisions Button */}
           <button className="edit-provisions-button" onClick={toggleEditOverlay}>
             Edit Provisions
+          </button>
+          <button className="edit-provisions-button" onClick={openNextMonth}>
+            Open Next Month
           </button>
         </div>
 
