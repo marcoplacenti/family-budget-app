@@ -16,43 +16,40 @@ APP_CLIENT_ID = os.environ['APP_CLIENT_ID']
 
 def lambda_handler(event, context):
     print(event)
-    # """
-    # {
-    #     'idToken': 'eyJraWQiOiI0WHd3QmFtSDlZVGlzV1JDaER3TWFQUFRRRStkenNWVllNcWJ4RFRmTEdjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0MzY0MzgyMi0zMDUxLTcwNDItYjAzYS05MWFkN2U4NGVmZDYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmV1LWNlbnRyYWwtMS5hbWF6b25hd3MuY29tXC9ldS1jZW50cmFsLTFfRlRYeEFPNGRVIiwiY29nbml0bzp1c2VybmFtZSI6IjQzNjQzODIyLTMwNTEtNzA0Mi1iMDNhLTkxYWQ3ZTg0ZWZkNiIsIm9yaWdpbl9qdGkiOiIxYjRlYTQ3NC05ODAyLTQ4ZWQtYjI3ZC03YWJjZGVmNWNlMmEiLCJhdWQiOiIybm5qMjNwcDh1Z29wcWtjcXQ3dWNvazFlYiIsImV2ZW50X2lkIjoiNDk5NWVkNGQtOTExMC00ZTk3LWE1NzUtNGMxNzAwOTU0MmE3IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3MzIxMjM4NjIsImV4cCI6MTczMjEyNzQ2MiwiaWF0IjoxNzMyMTIzODYyLCJqdGkiOiIwNDFhYzg0Yy0xYjYxLTQ1ODgtOGI4Ni1iMDAwY2EzOTlhNGQiLCJlbWFpbCI6InBsYWNlbnRpLm1hcmNvQGdtYWlsLmNvbSJ9.af_6845ZuEndcfH26DVhqXHobwfzcU12jb1mFlGSm2jhRrgAzcYYBqmwKwcWB2K3e2P-b3c6B99HWvPAKjeI0ZIyEI27voly8LM9DV3bQ-sOym0yItpesmCujN0VzrUcMqYgEOIKaZ8Jxy_sjWRzAOVbEXgVHJU78Y_etDSFrLEh6saCWKquHvL_rjkIKu0TP4PsXh3hUQQY6nwjA4t7LQ7T3QsNeqfNA7kB40nbN6RmlOSjo6iq_WdR7xfLHy8eDs961oRlzNHva5GhAQm2BSEg7GzLNOCE7XjEzWWp_ZUN4SsCqvfoBw850gqMX3tqwD2KGTdpfldA9FSkVEghGA',
-    #     'balances': {'Affitto': 'aa', 'Elettricità': 'bb', 'Assicurazione': 'hh', 'Alimentari': 'gg', 'Uscite': 'tt'}
-    # }
+    """
+    {
+        'idToken': '', 
+        'selectedPeriod': '2024-12', 
+        'basicNeedsAccountsEditProvisions': [{'name': 'Affitto', 'category': 'basic', 'initial_balance': '0,00', 'provision': '200,00', 'transactions': '0,00', 'current_balance': '8,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Assicurazione', 'category': 'basic', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Elettricità', 'category': 'basic', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Sindacato', 'category': 'basic', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'TV', 'category': 'basic', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Telefonia', 'category': 'basic', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}], 
+        'dailyNeedsAccountsEditProvisions': [{'name': 'Alimentari', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Complementari', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Medicinali', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Mobilio', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Trasporto', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Visite Mediche', 'category': 'daily', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}],
+        'entertainmentsAccountsEditProvisions': [{'name': 'Personali Marco', 'category': 'entertainment', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Personali Miriam', 'category': 'entertainment', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Uscite', 'category': 'entertainment', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Viaggi Palermo', 'category': 'entertainment', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Viaggi Ricreativi', 'category': 'entertainment', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}],
+        'savingsAccountsEditProvisions': [{'name': 'Automobile', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Casa Danimarca', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Casa Palermo', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Cassa', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Investimenti', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}, {'name': 'Safety Net', 'category': 'saving', 'initial_balance': '0,00', 'provision': '0,00', 'transactions': '0,00', 'current_balance': '0,00', 'available_periods': ['2024-11', '2024-12']}]}
+    """
 
-    # """
-    # id_token = event.get("idToken")
-    # decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
-    # user = decoded_payload.get('sub')
+    id_token = event.get("idToken")
+    decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
+    user = decoded_payload.get('sub')
 
-    # print(user)
+    period = event.get("period")
+    basic = event.get("basic")
+    daily = event.get("daily")
+    entertainment = event.get("entertainment")
+    saving = event.get("saving")
 
-    # start_month = event.get("startMonth")
-    # currency = event.get("currency")
-    # balances = event.get("balances")
+    data = []
+    data.extend(basic)
+    data.extend(daily)
+    data.extend(entertainment)
+    data.extend(saving)
+    print(data)
 
-    # currency_table = dynamodb_resource.Table('AccountsCurrency')
-    # response = currency_table.put_item(
-    #     Item={
-    #         'User': user,
-    #         'Currency': currency
-    #     }
-    # )
-
-    # print(user, start_month)
-    # periods_table = dynamodb_resource.Table('AccountsAvailablePeriods')
-    # response = periods_table.put_item(
-    #     Item={
-    #         'User': user,
-    #         'Periods': [start_month]
-    #     }
-    # )
-
-    # balances_table = dynamodb_resource.Table('AccountsBalances')
-    # provisions_table = dynamodb_resource.Table('AccountsProvisions')
-    # for account, amount in balances.items():
+    balances_table = dynamodb_resource.Table('AccountsBalances')
+    provisions_table = dynamodb_resource.Table('AccountsProvisions')
+    for item in data:
+        account = item['name']
+        provision = Decimal(float(item['provision'].replace(',', '.'))).quantize(Decimal('0.01'))
+        # provision = Decimal(round(float(item['provision'].replace(',', '.')),2))
+        print(period, account, provision, type(provision))
     #     response = balances_table.put_item(
     #         Item={
     #             'User': user,
@@ -72,13 +69,11 @@ def lambda_handler(event, context):
     #         }
     #     )
 
-    #     response = provisions_table.put_item(
-    #         Item={
-    #             'User': user,
-    #             'PeriodAccount': f"{start_month}_{account}",
-    #             'Amount': Decimal(0)
-    #         }
-    #     )
+        response = provisions_table.update_item(
+            Key={'User': user, 'PeriodAccount': f'{period}_{account}'},
+            UpdateExpression='SET Amount = :attrValue',
+            ExpressionAttributeValues={':attrValue': provision}
+        )
 
 
     # print(response)

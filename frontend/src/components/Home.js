@@ -24,6 +24,8 @@ function Home() {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
 
+  const [refreshFlag, setRefreshFlag] = useState(null)
+
   const navigate = useNavigate();
 
   const [isEditOverlayVisible, setIsEditOverlayVisible] = useState(false);
@@ -61,7 +63,7 @@ function Home() {
     console.log(storedIdToken)
     fetchUserData(storedIdToken, null)
 
-  }, []);
+  }, [refreshFlag]);
 
   // Fetch financial data
   const fetchData = async (data) => {
@@ -83,16 +85,18 @@ function Home() {
 
   const fetchPeriods = async (data) => {
     try {
-      // console.log(data)
+      console.log(data.available_periods)
       // console.log(Array.isArray(data.available_periods))
       // setAvailablePeriods([data.available_periods])
       // console.log(availablePeriods)
       // const months = ["2024-11", "2024-12", "2025-01"].reverse();
       setAvailableMonths(data.available_periods.reverse())
       setSelectedPeriod(availableMonths[0])
+      sessionStorage.setItem('availableMonths', data.available_periods.reverse())
+      sessionStorage.setItem('selectedPeriod', data.available_periods.reverse()[0])
       // setEntertainmentCategories(entertainment);
     } catch (error) {
-      console.error("Failed to fetch financial data:", error);
+      console.error("Problem with periods:", error);
     }
   };
 
@@ -198,12 +202,11 @@ function Home() {
     const functionName = "OpenNewPeriod";
     const payload = { idToken };
     const result = await lambdaInvoker.invoke(functionName, payload)
-    console.log(result)
     const newPeriod = result.new_period
     updateData(newPeriod)
   }
 
-  const updateData = (period) => {
+  const updateData = async (period) => {
 
     const fetchUserDataByPeriod = async (idToken, period) => {
       try {
@@ -212,18 +215,18 @@ function Home() {
         const result = await lambdaInvoker.invoke(functionName, payload)
         const statusCode = result.statusCode;
         fetchData(JSON.parse(result.accountsData));
-        fetchPeriods(JSON.parse(result.availablePeriods));
-        setSelectedPeriod(period)
+        sessionStorage.setItem('selectedPeriod', period)
       } catch (error) {
         console.error("Something went wrong:", error);
       }
     };
 
+    console.log(idToken, period)
     fetchUserDataByPeriod(idToken, period)
   };
 
-  const updateProvisions = (data) => {
-    console.log(selectedPeriod)
+  const updateProvisions = async (data) => {
+    console.log(sessionStorage.getItem('selectedPeriod'))
     console.log(basicNeedsAccountsEditProvisions)
     console.log(dailyNeedsAccountsEditProvisions)
     console.log(entertainmentsAccountsEditProvisions)
@@ -232,9 +235,37 @@ function Home() {
     /*
       HERE WE NEED TO INVOKE A LAMBDA TO UPDATE THE PROVISIONS AND THE CURRENT BALANCES
     */
+    const updateProvisions = async (idToken, period, basic, daily, entertainment, saving) => {
+      const functionName = "UserDataUpdater";
+      const payload = { 
+        idToken, 
+        period, 
+        basic,
+        daily,
+        entertainment,
+        saving
+      };
+      const result = await lambdaInvoker.invoke(functionName, payload)
+      //console.log(result)
+    }
+  
+    updateProvisions(idToken, sessionStorage.getItem('selectedPeriod'), 
+      basicNeedsAccountsEditProvisions, dailyNeedsAccountsEditProvisions,
+      entertainmentsAccountsEditProvisions, savingsAccountsEditProvisions);
 
-    updateData(selectedPeriod)
+    updateData(sessionStorage.getItem('selectedPeriod'))
     setIsEditOverlayVisible(false)
+    setRefreshFlag(generateRandomString())
+  }
+
+  function generateRandomString() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomString = '';
+    for (let i = 0; i < 16; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomString += characters.charAt(randomIndex);
+    }
+    return randomString;
   }
 
   return (
@@ -253,7 +284,7 @@ function Home() {
 
         {/* Bank Overview Section */}
         <div className="bank-overview">
-          <h3>Bank Overview for {selectedPeriod}</h3>
+          <h3>Bank Overview for {sessionStorage.getItem('selectedPeriod')}</h3>
           <div className="bank-details">
             <div>
               <strong>Main Account:</strong> {bankOverview.mainAccount ? formatCurrency(bankOverview.mainAccount) : 'Loading...'} €
@@ -269,7 +300,7 @@ function Home() {
           <label htmlFor="month-year-dropdown">Select Month/Year: </label>
           <select
             id="month-year-dropdown"
-            //value={selectedPeriod}
+            value={sessionStorage.getItem('selectedPeriod')}
             onChange={(e) => updateData(e.target.value)}
           >
             {availableMonths.map((month) => (
