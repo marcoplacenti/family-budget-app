@@ -10,6 +10,12 @@ function Home() {
   const [entertainmentsAccounts, setEntertainments] = useState([]);
   const [dailyNeedsAccounts, setDailyNeeds] = useState([]);
   const [savingsAccounts, setSavings] = useState([]);
+
+  const [basicNeedsAccountsEditProvisions, setBasicNeedsEditProvisions] = useState([]);
+  const [entertainmentsAccountsEditProvisions, setEntertainmentsEditProvisions] = useState([]);
+  const [dailyNeedsAccountsEditProvisions, setDailyNeedsEditProvisions] = useState([]);
+  const [savingsAccountsEditProvisions, setSavingsEditProvisions] = useState([]);
+
   const [bankOverview, setBankOverview] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState(null); 
   const [availableMonths, setAvailableMonths] = useState([]); 
@@ -38,93 +44,110 @@ function Home() {
     setAccessToken(storedIdToken);
     setRefreshToken(storedIdToken);
 
-    // TODO: Check existing months (aka do we already have data for this user?) Let's assume we never do for now
-    const checkUserDataInit = async (idToken) => {
+    const fetchUserData = async (idToken, period) => {
       try {
         const functionName = "UserDataFetcher";
-        const payload = { idToken };
+        const payload = { idToken, period };
         const result = await lambdaInvoker.invoke(functionName, payload)
         console.log(result)
         const statusCode = result.statusCode;
-        fetchData(JSON.parse(result.accountsData));
         fetchPeriods(JSON.parse(result.availablePeriods));
+        fetchData(JSON.parse(result.accountsData));
       } catch (error) {
         console.error("Something went wrong:", error);
       }
     };
 
     console.log(storedIdToken)
-    checkUserDataInit(storedIdToken)
-    
-    // Fetch financial data
-    const fetchData = async (data) => {
-      try {
-        setBasicNeeds(data.filter(item => item.category === "basic"));
-        setDailyNeeds(data.filter(item => item.category === "daily"));
-        setEntertainments(data.filter(item => item.category === "entertainment"));
-        setSavings(data.filter(item => item.category === "saving"));
-        // setEntertainmentCategories(entertainment);
-      } catch (error) {
-        console.error("Failed to fetch financial data:", error);
-      }
-    };
-
-    const fetchPeriods = async (data) => {
-      try {
-        // console.log(data)
-        // console.log(Array.isArray(data.available_periods))
-        // setAvailablePeriods([data.available_periods])
-        // console.log(availablePeriods)
-        // const months = ["2024-11", "2024-12", "2025-01"].reverse();
-        setAvailableMonths(data.available_periods.reverse())
-        // setEntertainmentCategories(entertainment);
-      } catch (error) {
-        console.error("Failed to fetch financial data:", error);
-      }
-    };
-
-    // Fetch bank overview
-    const fetchBankOverview = async (data) => {
-      try {
-        //console.log(data)
-
-        //setBankOverview(result);
-      } catch (error) {
-        console.error("Failed to fetch bank overview:", error);
-      }
-    };
+    fetchUserData(storedIdToken, null)
 
   }, []);
 
+  // Fetch financial data
+  const fetchData = async (data) => {
+    try {
+      setBasicNeeds(data.filter(item => item.category === "basic"));
+      setDailyNeeds(data.filter(item => item.category === "daily"));
+      setEntertainments(data.filter(item => item.category === "entertainment"));
+      setSavings(data.filter(item => item.category === "saving"));
+
+      setBasicNeedsEditProvisions(data.filter(item => item.category === "basic"));
+      setDailyNeedsEditProvisions(data.filter(item => item.category === "daily"));
+      setEntertainmentsEditProvisions(data.filter(item => item.category === "entertainment"));
+      setSavingsEditProvisions(data.filter(item => item.category === "saving"));
+      // setEntertainmentCategories(entertainment);
+    } catch (error) {
+      console.error("Failed to fetch financial data:", error);
+    }
+  };
+
+  const fetchPeriods = async (data) => {
+    try {
+      // console.log(data)
+      // console.log(Array.isArray(data.available_periods))
+      // setAvailablePeriods([data.available_periods])
+      // console.log(availablePeriods)
+      // const months = ["2024-11", "2024-12", "2025-01"].reverse();
+      setAvailableMonths(data.available_periods.reverse())
+      setSelectedPeriod(availableMonths[0])
+      // setEntertainmentCategories(entertainment);
+    } catch (error) {
+      console.error("Failed to fetch financial data:", error);
+    }
+  };
+
+  // Fetch bank overview
+  const fetchBankOverview = async (data) => {
+    try {
+      //console.log(data)
+
+      //setBankOverview(result);
+    } catch (error) {
+      console.error("Failed to fetch bank overview:", error);
+    }
+  };
+
   const updateCategory = (category, newData) => {
-    const categoryKeys = JSON.stringify(Object.keys(category))
-    if (categoryKeys === JSON.stringify(Object.keys(basicNeedsAccounts))) {
-      setBasicNeeds(newData)
+    console.log(newData)
+    if (category === 'basic') {
+      setBasicNeedsEditProvisions(newData)
     }
 
-    if (categoryKeys === JSON.stringify(Object.keys(dailyNeedsAccounts))) {
-      setDailyNeeds(newData)
+    if (category === 'daily') {
+      setDailyNeedsEditProvisions(newData)
     }
 
-    if (categoryKeys === JSON.stringify(Object.keys(entertainmentsAccounts))) {
-      setEntertainments(newData)
+    if (category === 'entertainment') {
+      setEntertainmentsEditProvisions(newData)
     }
 
-    if (categoryKeys === JSON.stringify(Object.keys(savingsAccounts))) {
-      setSavings(newData)
+    if (category === 'saving') {
+      setSavingsEditProvisions(newData)
     }
   }
 
-  const handleProvisionChange = (index, category, event) => {
-    const newData = { ...category }; // Create a shallow copy of the category
-    newData[index] = event.target.value; // Update the specific field with the raw input
-    updateCategory(category, newData); // Update the state dynamically
+  const handleProvisionChange = (index, accountsData, event) => {
+    const copyaccountData = structuredClone(accountsData); 
+    copyaccountData[index].provision = event.target.value
+    const category = copyaccountData[index].category
+    updateCategory(category, copyaccountData); // Update the state dynamically
   };
+
+  const updateCurrentBalance = (data) => {
+    console.log(data)
+    let initialBalance = parseFloat(data.initial_balance.replace('.', '').replace(',', '.'));
+    let provision = parseFloat(data.provision.replace('.', '').replace(',', '.'));
+    let transactions = parseFloat(data.transactions.replace('.', '').replace(',', '.'));
+    let currentBalance = initialBalance + provision - transactions
+
+    console.log(currentBalance)
+  }
   
-  const handleProvisionBlur = (index, category) => {
-    const newData = { ...category }; // Create a shallow copy of the category
-    let value = category[index]; // Get the current value
+  const handleProvisionBlur = (index, accountsData) => {
+    const copyaccountData = structuredClone(accountsData); 
+    let value = copyaccountData[index].provision; // Get the current value
     value = value.replace('.', '').replace(',', '.'); // Normalize for parsing
+    let category = copyaccountData[index].category
     
     // Check if it's a valid number
     if (!isNaN(parseFloat(value)) && isFinite(value)) {
@@ -136,12 +159,21 @@ function Home() {
       value = "0,00";
     }
   
-    newData[index] = value; // Update the value in the copied category
-    updateCategory(category, newData); // Update the state
+    copyaccountData[index].provision = value; // Update the value in the copied category
+    updateCurrentBalance(copyaccountData[index])
+    updateCategory(category, copyaccountData); // Update the state
   };
 
   const isNegative = (amount) => {
     return parseFloat(amount.replace('.', '').replace(',', '.'))
+  }
+
+  const currentBalance = (category) => {
+    let initialBalance = parseFloat(category.initial_balance.replace('.', '').replace(',', '.'));
+    let provision = parseFloat(category.provision.replace('.', '').replace(',', '.'));
+    let transactions = parseFloat(category.transactions.replace('.', '').replace(',', '.'));
+    let currentBalance = initialBalance + provision - transactions
+    return formatCurrency(parseFloat(currentBalance))
   }
 
   // Format numbers to 2 decimal places
@@ -171,10 +203,39 @@ function Home() {
     updateData(newPeriod)
   }
 
-  const updateData = (value) => {
-    console.log(value)
-    console.log(basicNeedsAccounts)
+  const updateData = (period) => {
+
+    const fetchUserDataByPeriod = async (idToken, period) => {
+      try {
+        const functionName = "UserDataFetcher";
+        const payload = { idToken, period };
+        const result = await lambdaInvoker.invoke(functionName, payload)
+        const statusCode = result.statusCode;
+        fetchData(JSON.parse(result.accountsData));
+        fetchPeriods(JSON.parse(result.availablePeriods));
+        setSelectedPeriod(period)
+      } catch (error) {
+        console.error("Something went wrong:", error);
+      }
+    };
+
+    fetchUserDataByPeriod(idToken, period)
   };
+
+  const updateProvisions = (data) => {
+    console.log(selectedPeriod)
+    console.log(basicNeedsAccountsEditProvisions)
+    console.log(dailyNeedsAccountsEditProvisions)
+    console.log(entertainmentsAccountsEditProvisions)
+    console.log(savingsAccountsEditProvisions)
+
+    /*
+      HERE WE NEED TO INVOKE A LAMBDA TO UPDATE THE PROVISIONS AND THE CURRENT BALANCES
+    */
+
+    updateData(selectedPeriod)
+    setIsEditOverlayVisible(false)
+  }
 
   return (
     
@@ -208,7 +269,7 @@ function Home() {
           <label htmlFor="month-year-dropdown">Select Month/Year: </label>
           <select
             id="month-year-dropdown"
-            value={selectedPeriod}
+            //value={selectedPeriod}
             onChange={(e) => updateData(e.target.value)}
           >
             {availableMonths.map((month) => (
@@ -378,7 +439,7 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {basicNeedsAccounts.map((category, index) => (
+                    {basicNeedsAccountsEditProvisions.map((category, index) => (
                       <tr key={index}>
                         <td>{category.name}</td>
                         <td>{category.initial_balance} €</td>
@@ -386,8 +447,8 @@ function Home() {
                           <input
                             type="text"
                             value={category.provision} 
-                            onChange={(e) => handleProvisionChange(index, basicNeedsAccounts, e)} 
-                            onBlur={() => handleProvisionBlur(index, basicNeedsAccounts)} 
+                            onChange={(e) => handleProvisionChange(index, basicNeedsAccountsEditProvisions, e)} 
+                            onBlur={() => handleProvisionBlur(index, basicNeedsAccountsEditProvisions)} 
                             placeholder="Enter provision"
                           />
                         </td>
@@ -396,13 +457,13 @@ function Home() {
                         </td>
 
                         <td className={isNegative(category.current_balance) < 0 ? "negative" : "positive"}>
-                        {category.current_balance} €
+                        {currentBalance(category)} €
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                <button onClick={updateData}>Save</button>
+                <button onClick={updateProvisions}>Save</button>
                 <button onClick={toggleEditOverlay}>Close</button>
               </div>
             </div>

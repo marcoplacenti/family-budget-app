@@ -72,6 +72,7 @@ def lambda_handler(event, context):
     available_periods_response = available_periods_table.get_item(Key={'User': user})
     available_periods = available_periods_response.get('Item')['Periods']
 
+    print(event.get("period"))
     if event.get("period") is not None:
         period = event.get("period")
     else:
