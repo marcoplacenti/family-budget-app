@@ -48,6 +48,7 @@ def lambda_handler(event, context):
     for item in data:
         account = item['name']
         provision = Decimal(float(item['provision'].replace(',', '.'))).quantize(Decimal('0.01'))
+        current_balance = Decimal(float(item['current_balance'].replace(',', '.'))).quantize(Decimal('0.01'))
         # provision = Decimal(round(float(item['provision'].replace(',', '.')),2))
         print(period, account, provision, type(provision))
     #     response = balances_table.put_item(
@@ -57,6 +58,12 @@ def lambda_handler(event, context):
     #             'Amount': Decimal(amount)
     #         }
     #     )
+
+        response = balances_table.update_item(
+            Key={'User': user, 'PeriodAccount': f'{period}_{account}'},
+            UpdateExpression='SET Amount = :attrValue',
+            ExpressionAttributeValues={':attrValue': current_balance}
+        )
 
     #     date_obj = datetime.strptime(start_month, '%Y-%m')
     #     previous_month = date_obj - relativedelta(months=1)

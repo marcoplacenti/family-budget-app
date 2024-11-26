@@ -16,8 +16,15 @@ function Home() {
   const [dailyNeedsAccountsEditProvisions, setDailyNeedsEditProvisions] = useState([]);
   const [savingsAccountsEditProvisions, setSavingsEditProvisions] = useState([]);
 
+  const [incomes, setIncomes] = useState([])
+  const [incomesEditable, setIncomesEditable] = useState([])
+
+  const [cumulativeIncome, setCumulativeIncome] = useState(null)
+  const [cumulativeProvisions, setCumulativeProvisions] = useState(null)
+  const [availableToProvision, setAvailableToProvision] = useState(null)
+
   const [bankOverview, setBankOverview] = useState({});
-  const [selectedPeriod, setSelectedPeriod] = useState(null); 
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
   const [availableMonths, setAvailableMonths] = useState([]); 
 
   const [idToken, setIdToken] = useState(null);
@@ -29,6 +36,7 @@ function Home() {
   const navigate = useNavigate();
 
   const [isEditOverlayVisible, setIsEditOverlayVisible] = useState(false);
+  const [isEditIncomesOverlayVisible, setIsEditIncomesOverlayVisible] = useState(false);
 
   const lambdaInvoker = new CustomLambdaInvocation();
 
@@ -55,6 +63,7 @@ function Home() {
         const statusCode = result.statusCode;
         fetchPeriods(JSON.parse(result.availablePeriods));
         fetchData(JSON.parse(result.accountsData));
+        fetchIncomes(JSON.parse(result.incomes), JSON.parse(result.accountsData));
       } catch (error) {
         console.error("Something went wrong:", error);
       }
@@ -77,11 +86,35 @@ function Home() {
       setDailyNeedsEditProvisions(data.filter(item => item.category === "daily"));
       setEntertainmentsEditProvisions(data.filter(item => item.category === "entertainment"));
       setSavingsEditProvisions(data.filter(item => item.category === "saving"));
+
       // setEntertainmentCategories(entertainment);
     } catch (error) {
       console.error("Failed to fetch financial data:", error);
     }
   };
+
+  const fetchIncomes = async (data, accountsData) => {
+    console.log(data)
+    setIncomes(data)
+    setIncomesEditable(data)
+    let totalIncome = 0
+    data.map((category, _) => (
+      totalIncome += parseFloat(category.amount.replace('.', '').replace(',', '.'))
+    ))
+    console.log(totalIncome+1)
+    setCumulativeIncome(formatCurrency(totalIncome+1))
+
+    let provisions = 0
+    console.log(accountsData)
+    accountsData.map((category, _) => (
+      provisions += parseFloat(category.provision.replace('.', '').replace(',', '.'))
+    ))
+
+    console.log(provisions)
+
+    setCumulativeProvisions(formatCurrency(provisions))
+    setAvailableToProvision(formatCurrency(totalIncome-provisions))
+  }
 
   const fetchPeriods = async (data) => {
     try {
@@ -144,7 +177,8 @@ function Home() {
     let transactions = parseFloat(data.transactions.replace('.', '').replace(',', '.'));
     let currentBalance = initialBalance + provision - transactions
 
-    console.log(currentBalance)
+    data.current_balance = formatCurrency(currentBalance) 
+    // console.log(formatCurrency(currentBalance))
   }
   
   const handleProvisionBlur = (index, accountsData) => {
@@ -198,15 +232,21 @@ function Home() {
     setIsEditOverlayVisible(!isEditOverlayVisible);
   };
 
+  const toggleEditIncomesOverlay = () => {
+    setIsEditIncomesOverlayVisible(!isEditIncomesOverlayVisible);
+  };
+
   const openNextMonth = async () => {
     const functionName = "OpenNewPeriod";
     const payload = { idToken };
     const result = await lambdaInvoker.invoke(functionName, payload)
     const newPeriod = result.new_period
     updateData(newPeriod)
+
+    setRefreshFlag(generateRandomString())
   }
 
-  const updateData = async (period) => {
+  const updateData = (period) => {
 
     const fetchUserDataByPeriod = async (idToken, period) => {
       try {
@@ -215,6 +255,7 @@ function Home() {
         const result = await lambdaInvoker.invoke(functionName, payload)
         const statusCode = result.statusCode;
         fetchData(JSON.parse(result.accountsData));
+        fetchIncomes(JSON.parse(result.incomes), JSON.parse(result.accountsData));
         sessionStorage.setItem('selectedPeriod', period)
       } catch (error) {
         console.error("Something went wrong:", error);
@@ -273,18 +314,40 @@ function Home() {
     <div className="overview">
       {/* Sidebar */}
       <div className="sidebar">
-        <button onClick={() => navigate("/overview")}>Overview</button>
+        {/* <button onClick={() => navigate("/overview")}>Overview</button> */}
         <button onClick={() => navigate("/transactions")}>Transactions</button>
         <button className="logout-button" onClick={handleLogout}>Logout</button>
       </div>
       
       {/* Main Content */}
       <div className="main-content">
-        <h2>Financial Overview</h2>
+        {/* Month-Year Dropdown */}
+        <div className="dropdown-container">
+          <div className="button-container">
+            <button className="edit-provisions-button" onClick={openNextMonth}>
+              Open Next Month
+            </button>
+          </div>
+          <div className="select-container">
+            <label htmlFor="month-year-dropdown"><h2>Select Period </h2></label>
+            <select
+              id="month-year-dropdown"
+              value={sessionStorage.getItem('selectedPeriod')}
+              onChange={(e) => updateData(e.target.value)}
+            >
+              {availableMonths.map((month) => (
+                <option key={month} value={month}>{new Date(month + "-01").toLocaleString('default', { month: 'long', year: 'numeric' })}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {/* Bank Overview Section */}
         <div className="bank-overview">
-          <h3>Bank Overview for {sessionStorage.getItem('selectedPeriod')}</h3>
+          <h3>Bank Overview for <span className="orange-text">
+              {new Date(sessionStorage.getItem('selectedPeriod') + "-01").toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+          </h3>
           <div className="bank-details">
             <div>
               <strong>Main Account:</strong> {bankOverview.mainAccount ? formatCurrency(bankOverview.mainAccount) : 'Loading...'} €
@@ -295,25 +358,76 @@ function Home() {
           </div>
         </div>
 
-        {/* Month-Year Dropdown */}
-        <div className="dropdown-container">
-          <label htmlFor="month-year-dropdown">Select Month/Year: </label>
-          <select
-            id="month-year-dropdown"
-            value={sessionStorage.getItem('selectedPeriod')}
-            onChange={(e) => updateData(e.target.value)}
-          >
-            {availableMonths.map((month) => (
-              <option key={month} value={month}>{new Date(month + "-01").toLocaleString('default', { month: 'long', year: 'numeric' })}</option>
-            ))}
-          </select>
+        {/* Bank Overview Section */}
+        <div className="category-group-wrapper">
+          <div className="income-overview">
+            <h3>Incomes Overview</h3>
+            <button className="edit-provisions-button" onClick={toggleEditIncomesOverlay}>
+              Update
+            </button>
+            {/* <div className="category-group-wrapper"> */}
+              <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <th>Total Income</th>
+                    <th>Provisioned</th>
+                    <th>Available to Provision</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {incomes.map((category, index) => (
+                  <tr key={index}>
+                    <td className='account-cell'>{category.name}</td>
+                    <td className='income-value'>{category.amount} €</td>
+                    {index === 0 ? <td className="total-value" rowspan={incomes.length.toString()}><strong>{cumulativeIncome}</strong></td> : null}
+                    {index === 0 ? <td className="total-allocated" rowspan={incomes.length.toString()}><strong>{cumulativeProvisions}</strong></td> : null}
+                    {index === 0 ? <td className="total-available" rowspan={incomes.length.toString()}><strong>{availableToProvision}</strong></td> : null}
+                  </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+            {/* </div> */}
+          </div>
 
-          {/* Edit Provisions Button */}
+          <div className="debts-overview">
+            <h3>Debts & Credits Overview</h3>
+            <button className="edit-provisions-button" onClick={toggleEditIncomesOverlay}>
+              Update
+            </button>
+              <div className="table-container">
+              <table className="financial-table">
+                <thead>
+                  <tr>
+                    <th>Debtor</th>
+                    <th>Creditor</th>
+                    <th>Amount</th>
+                    {/* <th>Provisioned</th>
+                    <th>Available to Provision</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {incomes.map((category, index) => (
+                  <tr key={index}>
+                    <td className='account-cell'>{category.name}</td>
+                    <td className='account-cell'>{category.amount} €</td>
+                    <td className="total-value"><strong>{cumulativeIncome}</strong></td>
+                    {/* {index === 0 ? <td className="total-allocated" rowspan={incomes.length.toString()}><strong>{cumulativeProvisions}</strong></td> : null}
+                    {index === 0 ? <td className="total-available" rowspan={incomes.length.toString()}><strong>{availableToProvision}</strong></td> : null} */}
+                  </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+            </div>
+        </div>
+        
+        <div>
           <button className="edit-provisions-button" onClick={toggleEditOverlay}>
             Edit Provisions
-          </button>
-          <button className="edit-provisions-button" onClick={openNextMonth}>
-            Open Next Month
           </button>
         </div>
 
@@ -496,6 +610,42 @@ function Home() {
                 </table>
                 <button onClick={updateProvisions}>Save</button>
                 <button onClick={toggleEditOverlay}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Overlay for Edit Provisions */}
+        {isEditIncomesOverlayVisible && (
+          <div className="overlay">
+            <div className="overlay-content">
+              <div className="form-container">
+                <table className="financial-table">
+                  <thead>
+                    <tr>
+                      <th>Source</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {incomesEditable.map((category, index) => (
+                      <tr key={index}>
+                        <td>{category.name}</td>
+                        <td>
+                          <input
+                            type="text"
+                            value={category.amount} 
+                            onChange={(e) => handleProvisionChange(index, incomesEditable, e)} 
+                            onBlur={() => handleProvisionBlur(index, incomesEditable)} 
+                            placeholder="Enter provision"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button onClick={updateProvisions}>Save</button>
+                <button onClick={toggleEditIncomesOverlay}>Close</button>
               </div>
             </div>
           </div>

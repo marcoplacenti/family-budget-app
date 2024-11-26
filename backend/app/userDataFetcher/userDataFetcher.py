@@ -63,6 +63,19 @@ def get_balance_or_provisions(user, period, table_name):
 
     return converted_items
 
+def get_incomes_and_transactions(user, period, table_name):
+    response = dynamodb_client.query(
+        TableName=table_name,
+        KeyConditionExpression="#userID = :user AND begins_with(PeriodAccount, :period)",
+        ExpressionAttributeNames={
+            "#userID": "User"  # Alias for the reserved word User
+        },
+        ExpressionAttributeValues={
+            ":user": {"S": user},
+            ":period": {"S": period}
+        }
+    )
+
 def lambda_handler(event, context):
     id_token = event.get("idToken")
     decoded_payload = jwt.decode(id_token, options={"verify_signature": False})
@@ -114,10 +127,10 @@ def lambda_handler(event, context):
             "current_balance": str(current_balance[account]),
             "available_periods": available_periods
         })
-     
-    print(json.dumps(response))
+
     return {
         "statusCode": 200,
         "accountsData": json.dumps(response),
-        "availablePeriods": json.dumps({"available_periods": available_periods})
+        "availablePeriods": json.dumps({"available_periods": available_periods}),
+        "incomes": json.dumps([{"name": "Reddito Miriam", "amount": str(Decimal('0').quantize(Decimal('0.00'))).replace('.', ',')}, {"name": 'Reddito Marco', "amount": str(Decimal('0').quantize(Decimal('0.00'))).replace('.', ',')}])
     }

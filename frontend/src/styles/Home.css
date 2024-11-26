@@ -132,11 +132,82 @@ table.financial-table .negative {
   margin: 0 20px;
 }
 
+/* Bank Overview */
+.income-overview {
+  flex: 60%; /* Take 65% of the space */
+  margin-left: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  /* padding: 10px; */
+  padding-top: 5px;
+  padding-left: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.income-overview .bank-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.income-overview .bank-details div {
+  margin: 0 20px;
+}
+
+.debts-overview {
+  flex: 40%; /* Take 65% of the space */
+  margin-right: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  /* padding: 10px; */
+  padding-top: 5px;
+  padding-left: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.debts-overview .bank-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.incodebtsme-overview .bank-details div {
+  margin: 0 20px;
+}
+
+
 /* Dropdown */
 .dropdown-container {
-  margin-left: 20px;
-  margin-bottom: 30px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container,
+.select-container {
+  display: flex;
+  align-items: center;
+}
+
+.select-container {
+  display: flex;
+  align-items: center;
+}
+
+.button-container button {
+  margin-bottom: 10px; /* Add some space below the button */
+}
+
+.select-container label {
+  margin-right: 10px; /* Add some space to separate the label and the select */
+  flex: 1; /* Take 20% of the space */
+}
+
+.select-container select {
+  flex: 4; /* Take 80% of the space */
 }
 
 .edit-provisions-button {
@@ -181,4 +252,44 @@ table.financial-table .provision-cell {
 
 table.financial-table .account-cell {
   font-weight: bold
+}
+
+.orange-text {
+  color: orange;
+}
+
+.total-value {
+  font-size: 20px;
+  color: green;
+}
+
+.total-allocated {
+  font-size: 20px;
+  color: blue;
+}
+
+.total-available {
+  font-size: 20px;
+}
+
+
+.total-available {
+  color: orange;
+  font-size: 20px;
+}
+
+.income-value {
+  color: green;
+}
+
+.category-group-wrapper {
+  display: flex; /* Use flexbox */
+}
+
+.first-div {
+  flex: 65%; /* Take 65% of the space */
+}
+
+.second-div {
+  flex: 35%; /* Take 35% of the space */
 }
